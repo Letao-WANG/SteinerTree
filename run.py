@@ -134,12 +134,12 @@ if __name__ == "__main__":
     with open(stein_file) as my_file:
         my_parser = SteinlibParser(my_file, my_class)
         my_parser.parse()
-        terms = my_class.terms
-        graph = my_class.my_graph
+        my_terms = my_class.terms
+        my_graph = my_class.my_graph
 
-        my_sol = approx_steiner(graph, terms)
-        # print_graph(graph, terms, my_sol)
-        print(eval_sol(graph, terms, my_sol))
+        my_sol = approx_steiner(my_graph, my_terms)
+        print_graph(my_graph, my_terms, my_sol)
+        print(eval_sol(my_graph, my_terms, my_sol))
         # algo_naive(graph, terms, my_sol)
 
 # comparer two parameters with interval, confidence

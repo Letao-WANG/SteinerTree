@@ -5,8 +5,8 @@ import networkx as nx
 from steinlib.instance import SteinlibInstance
 from steinlib.parser import SteinlibParser
 
-stein_file = "data/test.std"
-# stein_file = "data/B/b02.std"
+# stein_file = "data/test.std"
+stein_file = "data/B/b02.stp"
 
 
 # draw a graph in a window
@@ -42,12 +42,25 @@ def eval_sol(graph, terms, sol):
     # cost of solution
     cost = graph_sol.size(weight='weight')
 
-    return cost
+    return int(cost)
 
 
 def approx_steiner(graph, terms):
     """
     compute a approximate solution to the steiner problem
+    Graph: graph e.g. Graph with 7 nodes and 9 edges
+    List: terms e.g. [1,3,5,7]
+    Dict: len_path
+            e.g.
+                len_path[number of vertex][distance or path][number of vertex]
+                len_path[e[0]][0][e[1]]
+                {1:({1:0, 2:1,...,5:2}, {1:[1], 2:[1,2],...,5:[1,4,5]}),
+                2:({2:0, 1:1,...
+                ...
+                7}
+            and we have int: weight = len_path[e[0]][0][e[1]],
+                (int, int): edge = (len_path[e[0]][1][e[1]][i], len_path[e[0]][1][e[1]][i + 1])
+
     """
     # Find the shortest weighted paths of the original graph
     len_path = dict(nx.all_pairs_dijkstra(graph))
@@ -93,7 +106,7 @@ if __name__ == "__main__":
         graph = my_class.my_graph
 
         sol = approx_steiner(graph, terms)
-        print_graph(graph, terms, sol)
+        # print_graph(graph, terms, sol)
         print(eval_sol(graph, terms, sol))
 
 # comparer two parameters with interval, confidence

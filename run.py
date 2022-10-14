@@ -1,3 +1,4 @@
+import random
 import sys
 import itertools as it
 import matplotlib.pyplot as plt
@@ -81,6 +82,37 @@ def approx_steiner(graph, terms):
     return res
 
 
+def algo_naive(graph, terms, sol):
+    old_selected_edge = random.choice(sol)
+    not_selected_edge = random.choice(list(set(graph) - set(sol)))
+    sol = exchange_selected(old_selected_edge, not_selected_edge, graph, sol)
+    score = eval_sol(graph, terms, sol)
+    print(score)
+    return score
+
+
+def exchange_selected(old_edge, new_edge, graph, sol):
+    """
+    exchange a selected edge and a non-selected edge, exchange means change them in variable sol.
+    :param old_edge: old selected edges of type (int, int)
+    :param new_edge: new selected edges of type (int, int)
+    :param graph: Graph
+    :param sol: list of edges of type (int, int)
+    :return: sol
+
+    :TODO: optimize code style with throw exception, and verif it works
+    """
+    if old_edge in sol:
+        sol.remove(old_edge)
+        if new_edge in graph.edges:
+            sol.appand(new_edge)
+        else:
+            print("Error! new edge not in graph")
+    else:
+        print("Error! old edge not in sol")
+    return sol
+
+
 # class used to read a steinlib instance
 class MySteinlibInstance(SteinlibInstance):
     my_graph = nx.Graph()
@@ -105,8 +137,9 @@ if __name__ == "__main__":
         terms = my_class.terms
         graph = my_class.my_graph
 
-        sol = approx_steiner(graph, terms)
-        # print_graph(graph, terms, sol)
-        print(eval_sol(graph, terms, sol))
+        my_sol = approx_steiner(graph, terms)
+        # print_graph(graph, terms, my_sol)
+        print(eval_sol(graph, terms, my_sol))
+        # algo_naive(graph, terms, my_sol)
 
 # comparer two parameters with interval, confidence

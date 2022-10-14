@@ -5,19 +5,18 @@ import networkx as nx
 from steinlib.instance import SteinlibInstance
 from steinlib.parser import SteinlibParser
 
-# stein_file = "data/B/b04.stp"
 stein_file = "data/test.std"
+# stein_file = "data/B/b02.std"
 
 
 # draw a graph in a window
 def print_graph(graph, terms=None, sol=None):
-
     pos = nx.kamada_kawai_layout(graph)
 
-    nx.draw(graph, pos)
-    if not (terms is None):
+    nx.draw(graph, pos, with_labels=True)
+    if (not (terms is None)):
         nx.draw_networkx_nodes(graph, pos, nodelist=terms, node_color='r')
-    if not (sol is None):
+    if (not (sol is None)):
         nx.draw_networkx_edges(graph, pos, edgelist=sol, edge_color='r')
     plt.show()
     return
@@ -25,7 +24,6 @@ def print_graph(graph, terms=None, sol=None):
 
 # verify if a solution is correct and evaluate it
 def eval_sol(graph, terms, sol):
-
     graph_sol = nx.Graph()
     for (i, j) in sol:
         graph_sol.add_edge(i, j, weight=graph[i][j]['weight'])
@@ -47,17 +45,17 @@ def eval_sol(graph, terms, sol):
     return cost
 
 
-# compute a approximate solution to the steiner problem
 def approx_steiner(graph, terms):
+    """
+    compute a approximate solution to the steiner problem
+    """
     # Find the shortest weighted paths of the original graph
     len_path = dict(nx.all_pairs_dijkstra(graph))
     # The complete graph of terminals
     comp_graph = nx.complete_graph(terms)
     # Add weight to the edges
-    # print(comp_graph.edges)
     for e in comp_graph.edges:
         comp_graph[e[0]][e[1]]['weight'] = len_path[e[0]][0][e[1]]
-        # print(e[0], "/", e[1], ":", comp_graph[e[0]][e[1]]['weight'])
     # The minimum spanning tree of the complete graph
     min_span_tree = nx.minimum_spanning_tree(comp_graph)
     res = []
@@ -66,15 +64,12 @@ def approx_steiner(graph, terms):
         for i in range(len(len_path[e[0]][1][e[1]]) - 1):
             res.append((len_path[e[0]][1][e[1]][i],
                         len_path[e[0]][1][e[1]][i + 1]))
-
     # return a list of edges
-    # print(res)
     return res
 
 
 # class used to read a steinlib instance
 class MySteinlibInstance(SteinlibInstance):
-
     my_graph = nx.Graph()
     terms = []
 
@@ -85,6 +80,7 @@ class MySteinlibInstance(SteinlibInstance):
         e_start = converted_token[0]
         e_end = converted_token[1]
         weight = converted_token[2]
+        # print ("weight: " + str(weight))
         self.my_graph.add_edge(e_start, e_end, weight=weight)
 
 
@@ -93,10 +89,11 @@ if __name__ == "__main__":
     with open(stein_file) as my_file:
         my_parser = SteinlibParser(my_file, my_class)
         my_parser.parse()
-        my_terms = my_class.terms
-        my_graph = my_class.my_graph
-        print_graph(my_graph, my_terms)
+        terms = my_class.terms
+        graph = my_class.my_graph
 
-        my_sol = approx_steiner(my_graph, my_terms)
-        print_graph(my_graph, my_terms, my_sol)
-        print(eval_sol(my_graph, my_terms, my_sol))
+        sol = approx_steiner(graph, terms)
+        print_graph(graph, terms, sol)
+        print(eval_sol(graph, terms, sol))
+
+# comparer two parameters with interval, confidence

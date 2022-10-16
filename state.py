@@ -46,11 +46,11 @@ class State(object):
         # are the terminals covered
         for i in self.terms:
             if i not in graph_sol:
-                cost += 50
+                cost += 100
 
         number_components = nx.number_connected_components(graph_sol)
         for _ in range(number_components - 1):
-            cost += 50
+            cost += 100
 
         return int(cost)
 

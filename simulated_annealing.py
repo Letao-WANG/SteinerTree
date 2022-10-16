@@ -13,9 +13,15 @@ stein_file = "data/B/b02.stp"
 
 
 def annealing(state, times):
-    for _ in range(times):
+    points_x = []
+    points_y = []
+    for i in range(times):
         state = optimize(state)
-    return state
+        if i % 100 == 0:
+            points_x.append(i)
+            points_y.append(state.score)
+        # print(state)
+    return state, points_x, points_y
 
 
 def optimize(state):
@@ -76,9 +82,9 @@ if __name__ == "__main__":
         my_graph = my_class.my_graph
         my_sol = get_sol_list(my_graph)
 
-        my_state = State(my_graph, my_terms, my_sol, temperature=100.0, speed=0.001)
-        final_state = annealing(my_state, 100000)
-        print(final_state)
-        # my_state.print_graph()
+        my_state = State(my_graph, my_terms, my_sol, temperature=20.0, speed=0.002)
+        final_state, point_x, point_y = annealing(my_state, 10000)
 
-# comparer two parameters with interval, confidence
+        print(final_state)
+        plt.plot(point_x, point_y)
+        plt.show()

@@ -11,9 +11,9 @@ stein_file = "data/B/b02.stp"
 
 
 # draw a graph in a window
-def print_graph(graph, terms=None, sol=None):
+def print_graph(graph, terms=None, sol=None, index=1):
     pos = nx.kamada_kawai_layout(graph)
-
+    plt.figure(index)
     nx.draw(graph, pos, with_labels=True)
     if (not (terms is None)):
         nx.draw_networkx_nodes(graph, pos, nodelist=terms, node_color='r')
@@ -24,15 +24,16 @@ def print_graph(graph, terms=None, sol=None):
 
 
 # verify if a solution is correct and evaluate it
-def eval_sol(graph, terms, sol):
+def eval_sol(graph, terms, sol, verif_tree=False):
     graph_sol = nx.Graph()
     for (i, j) in sol:
         graph_sol.add_edge(i, j, weight=graph[i][j]['weight'])
 
     # is sol a tree
-    if (not (nx.is_tree(graph_sol))):
-        print("Error: the proposed solution is not a tree")
-        return -1
+    if verif_tree:
+        if (not (nx.is_tree(graph_sol))):
+            print("Error: the proposed solution is not a tree")
+            return -1
 
     # are the terminals covered
     for i in terms:
@@ -84,33 +85,39 @@ def approx_steiner(graph, terms):
 
 def algo_naive(graph, terms, sol):
     old_selected_edge = random.choice(sol)
-    not_selected_edge = random.choice(list(set(graph) - set(sol)))
+    not_selected_edges = list(set(graph.edges) - set(sol))
+    not_selected_edge = random.choice(not_selected_edges)
     sol = exchange_selected(old_selected_edge, not_selected_edge, graph, sol)
     score = eval_sol(graph, terms, sol)
-    print(score)
+    print_graph(graph, terms, sol, 2)
     return score
 
 
-def exchange_selected(old_edge, new_edge, graph, sol):
+def exchange_selected(old_edge, new_edge, sol):
     """
     exchange a selected edge and a non-selected edge, exchange means change them in variable sol.
-    :param old_edge: old selected edges of type (int, int)
-    :param new_edge: new selected edges of type (int, int)
+    :param old_edge: old selected edges of type (int, int), which is selected, i.e. in the sol list
+    :param new_edge: new selected edges of type (int, int), which is not selected, i.e. not in the sol list
     :param graph: Graph
     :param sol: list of edges of type (int, int)
     :return: sol
-
     :TODO: optimize code style with throw exception, and verif it works
     """
-    if old_edge in sol:
+    # verif inputs are valid
+    if is_selected(old_edge, sol) and is_not_selected(new_edge, sol):
         sol.remove(old_edge)
-        if new_edge in graph.edges:
-            sol.appand(new_edge)
-        else:
-            print("Error! new edge not in graph")
+        sol.append(new_edge)
     else:
-        print("Error! old edge not in sol")
+        print("ERROR! exchange not valid")
     return sol
+
+
+def is_not_selected(edge, sol):
+    return edge not in sol
+
+
+def is_selected(edge, sol):
+    return edge in sol
 
 
 # class used to read a steinlib instance
@@ -140,6 +147,3 @@ if __name__ == "__main__":
         my_sol = approx_steiner(my_graph, my_terms)
         print_graph(my_graph, my_terms, my_sol)
         print(eval_sol(my_graph, my_terms, my_sol))
-        # algo_naive(graph, terms, my_sol)
-
-# comparer two parameters with interval, confidence

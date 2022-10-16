@@ -2,6 +2,7 @@ import random
 import sys
 import itertools as it
 import matplotlib.pyplot as plt
+import math
 import networkx as nx
 from steinlib.instance import SteinlibInstance
 from steinlib.parser import SteinlibParser
@@ -11,10 +12,9 @@ from state import State
 stein_file = "data/B/b02.stp"
 
 
-def annealing(state):
-    for _ in range(200):
+def annealing(state, times):
+    for _ in range(times):
         state = optimize(state)
-        print(state)
     return state
 
 
@@ -24,10 +24,25 @@ def optimize(state):
         old_sol.append(e)
     old_score = state.score
     state.random_action()
-    if old_score < state.score:
-        return State(state.graph, state.terms, old_sol)
-    else:
+    new_score = state.score
+    proba = func_proba(state, new_score, old_score)
+    if random.uniform(0, 1) < proba:
         return state
+    else:
+        return State(state.graph, state.terms, old_sol, state.temperature, state.speed)
+
+
+def func_proba(state, new_score, old_score):
+    """
+    The probability to update state
+    """
+    if old_score >= new_score:
+        return 1.0
+    elif old_score < new_score:
+        if state.temperature <= 0.0:
+            return 0.0
+        else:
+            return math.exp(-(new_score - old_score) / state.temperature)
 
 
 def get_sol_list(graph):
@@ -49,7 +64,6 @@ class MySteinlibInstance(SteinlibInstance):
         e_start = converted_token[0]
         e_end = converted_token[1]
         weight = converted_token[2]
-        # print ("weight: " + str(weight))
         self.my_graph.add_edge(e_start, e_end, weight=weight)
 
 
@@ -62,8 +76,9 @@ if __name__ == "__main__":
         my_graph = my_class.my_graph
         my_sol = get_sol_list(my_graph)
 
-        my_state = State(my_graph, my_terms, my_sol)
-        my_state = annealing(my_state)
-        my_state.print_graph()
+        my_state = State(my_graph, my_terms, my_sol, temperature=100.0, speed=0.001)
+        final_state = annealing(my_state, 100000)
+        print(final_state)
+        # my_state.print_graph()
 
 # comparer two parameters with interval, confidence

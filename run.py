@@ -6,8 +6,8 @@ import networkx as nx
 from steinlib.instance import SteinlibInstance
 from steinlib.parser import SteinlibParser
 
-# stein_file = "data/test.std"
-stein_file = "data/B/b02.stp"
+stein_file = "data/test.std"
+# stein_file = "data/B/b02.stp"
 
 
 # draw a graph in a window
@@ -66,6 +66,7 @@ def approx_steiner(graph, terms):
     """
     # Find the shortest weighted paths of the original graph
     len_path = dict(nx.all_pairs_dijkstra(graph))
+    # print(len_path)
     # The complete graph of terminals
     comp_graph = nx.complete_graph(terms)
     # Add weight to the edges
@@ -73,13 +74,17 @@ def approx_steiner(graph, terms):
         comp_graph[e[0]][e[1]]['weight'] = len_path[e[0]][0][e[1]]
     # The minimum spanning tree of the complete graph
     min_span_tree = nx.minimum_spanning_tree(comp_graph)
+    # print(min_span_tree.edges)
     res = []
     # path to edges
     for e in min_span_tree.edges:
         for i in range(len(len_path[e[0]][1][e[1]]) - 1):
             res.append((len_path[e[0]][1][e[1]][i],
                         len_path[e[0]][1][e[1]][i + 1]))
+    # remove the duplicate
+    res = list(set(res))
     # return a list of edges
+    # print(res)
     return res
 
 

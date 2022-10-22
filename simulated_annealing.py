@@ -8,8 +8,8 @@ from steinlib.instance import SteinlibInstance
 from steinlib.parser import SteinlibParser
 from state import State
 
-# stein_file = "data/test.std"
-stein_file = "data/B/b02.stp"
+stein_file = "data/test.std"
+# stein_file = "data/B/b02.stp"
 
 
 def annealing(state: State, times: int):
@@ -69,6 +69,13 @@ def get_sol_list(graph):
     return res
 
 
+def get_selected_nodes(graph):
+    res = []
+    for e in graph.nodes:
+        res.append(e)
+    return res
+
+
 # class used to read a steinlib instance
 class MySteinlibInstance(SteinlibInstance):
     my_graph = nx.Graph()
@@ -96,10 +103,18 @@ if __name__ == "__main__":
         my_sol = get_sol_list(my_graph)
 
         # execute simulated annealing algorithm
-        my_state = State(my_graph, my_terms, my_sol, temperature=20.0, speed=0.002)
-        final_state, point_x, point_y = annealing(my_state, 10000)
+        my_state = State(my_graph, my_terms, my_sol, temperature=20.0, speed=0.02)
+        # final_state, point_x, point_y = annealing(my_state, 1000)
 
         # print the result
-        print(final_state)
-        plt.plot(point_x, point_y)
-        plt.show()
+        # print(final_state.unselected_nodes)
+        # final_state.delete_random_node()
+        # print(final_state.selected_nodes)
+        my_state.delete_random_node()
+        my_state.delete_random_node()
+        my_state.print_graph()
+
+
+        # show the graph
+        # plt.plot(point_x, point_y)
+        # plt.show()

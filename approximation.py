@@ -4,8 +4,8 @@ import networkx as nx
 from steinlib.instance import SteinlibInstance
 from steinlib.parser import SteinlibParser
 
-# stein_file = "data/test.std"
-stein_file = "data/B/b02.stp"
+stein_file = "data/test.std"
+# stein_file = "data/B/b02.stp"
 
 
 # draw a graph in a window

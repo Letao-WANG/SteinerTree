@@ -149,5 +149,7 @@ if __name__ == "__main__":
         my_graph = my_class.my_graph
 
         my_sol = approx_steiner(my_graph, my_terms)
-        print_graph(my_graph, my_terms, my_sol)
+        # print_graph(my_graph, my_terms, my_sol)
         print(eval_sol(my_graph, my_terms, my_sol))
+
+        print(my_sol)

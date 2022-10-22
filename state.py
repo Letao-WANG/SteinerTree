@@ -4,7 +4,17 @@ import matplotlib.pyplot as plt
 
 
 class State(object):
-    def __init__(self, graph, terms, sol, temperature: float, speed: float):
+    """
+    This class represents the state of graph
+    """
+    def __init__(self, graph, terms: [], sol: [], temperature: float, speed: float):
+        """
+        graph: nx.Graph()
+        terms: the nodes list we want to span (parcours)
+        sol: the edges list to span terms. ATTENTION! it is equal to "selected edges"
+        temperature: parameter of simulated annealing algorithm, amplitude to optimize
+        speed: parameter of simulated annealing algorithm, speed reduce temperature
+        """
         self.graph = graph
         self.terms = terms
         self.sol = sol
@@ -15,7 +25,10 @@ class State(object):
         res = "score :" + str(self.score) + ", temperature: " + str(self.temperature)
         return res
 
-    def random_action(self):
+    def random_edge_action(self):
+        """
+        do a random edge action, delete a selected edge or add an unselected edge
+        """
         decision = random.randint(0, 1)
         if decision == 0:
             self.delete_random_sol()
@@ -37,6 +50,9 @@ class State(object):
 
     @property
     def score(self):
+        """
+        Evaluation function for the graph state
+        """
         graph_sol = nx.Graph()
         for (i, j) in self.sol:
             graph_sol.add_edge(i, j, weight=self.graph[i][j]['weight'])
@@ -55,6 +71,9 @@ class State(object):
         return int(cost)
 
     def print_graph(self):
+        """
+        print the graphic state
+        """
         pos = nx.kamada_kawai_layout(self.graph)
         nx.draw(self.graph, pos, with_labels=True)
         if not (self.terms is None):

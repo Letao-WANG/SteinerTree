@@ -12,7 +12,10 @@ from state import State
 stein_file = "data/B/b02.stp"
 
 
-def annealing(state, times):
+def annealing(state: State, times: int):
+    """
+    Simulated annealing algorithm
+    """
     points_x = []
     points_y = []
     for i in range(times):
@@ -24,12 +27,16 @@ def annealing(state, times):
     return state, points_x, points_y
 
 
-def optimize(state):
+def optimize(state: State):
+    """
+    Update function or function voisine
+    Input an old state, output a new state with probability
+    """
     old_sol = []
     for e in state.sol:
         old_sol.append(e)
     old_score = state.score
-    state.random_action()
+    state.random_edge_action()
     new_score = state.score
     proba = func_proba(state, new_score, old_score)
     if random.uniform(0, 1) < proba:
@@ -52,6 +59,10 @@ def func_proba(state, new_score, old_score):
 
 
 def get_sol_list(graph):
+    """
+    graph: nx.Graph()
+    get sol (selected edges) of graph
+    """
     res = []
     for e in graph.edges:
         res.append((e[0], e[1]))
@@ -76,15 +87,19 @@ class MySteinlibInstance(SteinlibInstance):
 if __name__ == "__main__":
     my_class = MySteinlibInstance()
     with open(stein_file) as my_file:
+
+        # initialisation
         my_parser = SteinlibParser(my_file, my_class)
         my_parser.parse()
         my_terms = my_class.terms
         my_graph = my_class.my_graph
         my_sol = get_sol_list(my_graph)
 
+        # execute simulated annealing algorithm
         my_state = State(my_graph, my_terms, my_sol, temperature=20.0, speed=0.002)
         final_state, point_x, point_y = annealing(my_state, 10000)
 
+        # print the result
         print(final_state)
         plt.plot(point_x, point_y)
         plt.show()

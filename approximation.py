@@ -1,13 +1,11 @@
 import random
-import sys
-import itertools as it
 import matplotlib.pyplot as plt
 import networkx as nx
 from steinlib.instance import SteinlibInstance
 from steinlib.parser import SteinlibParser
 
-stein_file = "data/test.std"
-# stein_file = "data/B/b02.stp"
+# stein_file = "data/test.std"
+stein_file = "data/B/b02.stp"
 
 
 # draw a graph in a window
@@ -86,42 +84,6 @@ def approx_steiner(graph, terms):
     # return a list of edges
     # print(res)
     return res
-
-
-def algo_naive(graph, terms, sol):
-    old_selected_edge = random.choice(sol)
-    not_selected_edges = list(set(graph.edges) - set(sol))
-    not_selected_edge = random.choice(not_selected_edges)
-    sol = exchange_selected(old_selected_edge, not_selected_edge, graph, sol)
-    score = eval_sol(graph, terms, sol)
-    print_graph(graph, terms, sol, 2)
-    return score
-
-
-def exchange_selected(old_edge, new_edge, sol):
-    """
-    exchange a selected edge and a non-selected edge, exchange means change them in variable sol.
-    :param old_edge: old selected edges of type (int, int), which is selected, i.e. in the sol list
-    :param new_edge: new selected edges of type (int, int), which is not selected, i.e. not in the sol list
-    :param sol: list of edges of type (int, int)
-    :return: sol
-    :TODO: optimize code style with throw exception, and verif it works
-    """
-    # verif inputs are valid
-    if is_selected(old_edge, sol) and is_not_selected(new_edge, sol):
-        sol.remove(old_edge)
-        sol.append(new_edge)
-    else:
-        print("ERROR! exchange not valid")
-    return sol
-
-
-def is_not_selected(edge, sol):
-    return edge not in sol
-
-
-def is_selected(edge, sol):
-    return edge in sol
 
 
 # class used to read a steinlib instance

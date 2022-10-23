@@ -11,7 +11,7 @@ import util
 from state import State
 
 # stein_file = "data/test.std"
-stein_file = "data/B/b02.stp"
+stein_file = "data/B/b05.stp"
 
 
 def annealing(state: State, times: int):
@@ -113,9 +113,9 @@ if __name__ == "__main__":
         # my_state.add_random_node()
 
         print(final_state)
-        print(len(final_state.sol))
-        print(len(final_state.terms))
-        final_state.print_graph()
+        # print(len(final_state.sol))
+        # print(len(final_state.terms))
+        # final_state.print_graph()
 
 
         # show the graph

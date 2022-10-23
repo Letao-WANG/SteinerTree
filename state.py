@@ -99,7 +99,8 @@ class State(object):
             self.temperature = self.temperature - self.speed
 
     def delete_random_node(self):
-        selected_not_terms_nodes = list(set(self.selected_nodes) - set(self.terms))
+        # selected_not_terms_nodes = list(set(self.selected_nodes) - set(self.terms))
+        selected_not_terms_nodes = self.selected_nodes
         if len(selected_not_terms_nodes) > 0:
             node_delete = random.choice(selected_not_terms_nodes)
             neighbor_edges = self.get_neighbor_edges(node_delete)
@@ -151,7 +152,7 @@ class State(object):
         #         min_distance = node_distance
         #         index1 = node_index
 
-        n = 5
+        n = 3
         index_list = nlargest(n, nodes_distance, key=nodes_distance.get)
         random_number = random.randint(0, n - 1)
         index = index_list[random_number]

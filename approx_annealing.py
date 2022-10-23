@@ -14,6 +14,47 @@ from state import State
 stein_file = "data/B/b02.stp"
 
 
+def approx_steiner(graph, terms):
+    """
+    compute a approximate solution to the steiner problem
+    Graph: graph e.g. Graph with 7 nodes and 9 edges
+    List: terms e.g. [1,3,5,7]
+    Dict: len_path
+            e.g.
+                len_path[number of vertex][distance or path][number of vertex]
+                len_path[e[0]][0][e[1]]
+                {1:({1:0, 2:1,...,5:2}, {1:[1], 2:[1,2],...,5:[1,4,5]}),
+                2:({2:0, 1:1,...
+                ...
+                7}
+            and we have int: weight = len_path[e[0]][0][e[1]],
+                (int, int): edge = (len_path[e[0]][1][e[1]][i], len_path[e[0]][1][e[1]][i + 1])
+
+    """
+    # Find the shortest weighted paths of the original graph
+    len_path = dict(nx.all_pairs_dijkstra(graph))
+    # print(len_path)
+    # The complete graph of terminals
+    comp_graph = nx.complete_graph(terms)
+    # Add weight to the edges
+    for e in comp_graph.edges:
+        comp_graph[e[0]][e[1]]['weight'] = len_path[e[0]][0][e[1]]
+    # The minimum spanning tree of the complete graph
+    min_span_tree = nx.minimum_spanning_tree(comp_graph)
+    # print(min_span_tree.edges)
+    res = []
+    # path to edges
+    for e in min_span_tree.edges:
+        for i in range(len(len_path[e[0]][1][e[1]]) - 1):
+            res.append((len_path[e[0]][1][e[1]][i],
+                        len_path[e[0]][1][e[1]][i + 1]))
+    # remove the duplicate
+    res = list(set(res))
+    # return a list of edges
+    # print(res)
+    return res
+
+
 def annealing(state: State, times: int):
     """
     Simulated annealing algorithm
@@ -102,7 +143,7 @@ if __name__ == "__main__":
         my_parser.parse()
         my_terms = my_class.terms
         my_graph = my_class.my_graph
-        my_sol = get_sol_list(my_graph)
+        my_sol = approx_steiner(my_graph, my_terms)
 
         # execute simulated annealing algorithm
         my_state = State(my_graph, my_terms, my_sol, temperature=30.0, speed=0.01)

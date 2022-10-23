@@ -1,6 +1,9 @@
 import random
 import networkx as nx
 import matplotlib.pyplot as plt
+from heapq import nlargest
+
+import util
 
 
 class State(object):
@@ -105,10 +108,54 @@ class State(object):
                     self.sol.remove(edge)
 
     def add_random_node(self):
-        if len(self.graph.edges) > len(self.sol):
-            not_selected_edges = list(set(self.graph.edges) - set(self.sol))
-            edge_add = random.choice(not_selected_edges)
-            self.sol.append(edge_add)
+        # not_terms = list(set(self.graph.nodes) - set(self.terms))
+        # unselected_terms_nodes = list(set(self.unselected_nodes) - set(not_terms))
+        unselected_terms_nodes = self.terms
+        if len(unselected_terms_nodes) > 0:
+            node_add = random.choice(unselected_terms_nodes)
+            list_path = self.get_closest_path_to_selected_node(node_add)
+            list_path_to_add = util.split_list(list_path)
+            for element in list_path_to_add:
+                if element not in self.sol:
+                    self.sol.append(element)
+
+    def get_closest_path(self, node1, node2):
+        """
+        get the closest path from node1 to node2
+        return list of edges
+        """
+        len_path = dict(nx.all_pairs_dijkstra(self.graph))
+        nodes_len_path = len_path[node1]
+        nodes_path = nodes_len_path[1]
+        path = nodes_path[node2]
+        return path
+
+    def get_closest_path_to_selected_node(self, node):
+        """
+        get the closest path from node to another selected node
+        return list of edges
+        """
+        len_path = dict(nx.all_pairs_dijkstra(self.graph))
+        nodes_len_path = len_path[node]
+        nodes_distance = 0
+        nodes_path = []
+        nodes_distance = nodes_len_path[0]
+        nodes_path = nodes_len_path[1]
+
+        # find the mini distance to other node
+        # min_distance = 100
+        # index1 = 1
+        # index2 = 1
+        # for node_index, node_distance in nodes_distance.items():
+        #     if min_distance > node_distance and node_index in self.selected_nodes:
+        #         min_distance = node_distance
+        #         index1 = node_index
+
+        n = 5
+        index_list = nlargest(n, nodes_distance, key=nodes_distance.get)
+        random_number = random.randint(0, n - 1)
+        index = index_list[random_number]
+        return self.get_closest_path(node, index)
 
     def random_edge_action(self):
         """
@@ -131,7 +178,8 @@ class State(object):
         if len(self.graph.edges) > len(self.sol):
             not_selected_edges = list(set(self.graph.edges) - set(self.sol))
             edge_add = random.choice(not_selected_edges)
-            self.sol.append(edge_add)
+            if edge_add not in self.sol:
+                self.sol.append(edge_add)
 
     def print_graph(self):
         """

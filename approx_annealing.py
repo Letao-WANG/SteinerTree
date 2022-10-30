@@ -79,7 +79,7 @@ def optimize(state: State):
     for e in state.sol:
         old_sol.append(e)
     old_score = state.score
-    state.random_node_action()
+    state.random_edge_action()
     new_score = state.score
     proba = func_proba(state, new_score, old_score)
     if random.uniform(0, 1) < proba:
@@ -154,8 +154,8 @@ if __name__ == "__main__":
         # my_state.add_random_node()
 
         print(final_state)
-        print(len(final_state.sol))
-        print(len(final_state.terms))
+        # print(len(final_state.sol))
+        # print(len(final_state.terms))
         final_state.print_graph()
 
 

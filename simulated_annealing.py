@@ -10,26 +10,22 @@ from steinlib.parser import SteinlibParser
 import util
 from state import State
 
-# stein_file = "data/test.std"
-stein_file = "data/B/b05.stp"
 
-
-def annealing(state: State, times: int):
+def annealing(state: State, times: int, node_method=True):
     """
     Simulated annealing algorithm
     """
     points_x = []
     points_y = []
     for i in range(times):
-        state = optimize(state)
+        state = optimize(state, node_method)
         if i % 10 == 0:
             points_x.append(i)
             points_y.append(state.score)
-        # print(state)
     return state, points_x, points_y
 
 
-def optimize(state: State):
+def optimize(state: State, node_method):
     """
     Update function or function voisine
     Input an old state, output a new state with probability
@@ -38,9 +34,13 @@ def optimize(state: State):
     for e in state.sol:
         old_sol.append(e)
     old_score = state.score
-    state.random_node_action()
+    if node_method:
+        state.random_node_action()
+    else:
+        state.random_edge_action()
     new_score = state.score
     proba = func_proba(state, new_score, old_score)
+    # proba = func_sigmoid_proba(state, new_score, old_score)
     if random.uniform(0, 1) < proba:
         return state
     else:
@@ -58,6 +58,15 @@ def func_proba(state, new_score, old_score):
             return 0.0
         else:
             return math.exp(-(new_score - old_score) / state.temperature)
+
+
+def func_sigmoid_proba(state, new_score, old_score):
+    # let coefficient change with temperature
+    coefficient = 1.0/state.temperature
+    # in case the coefficient is too big
+    if coefficient > 1:
+        coefficient = 1
+    return 1.0 / (1.0 + math.exp(coefficient * (new_score - old_score)))
 
 
 def get_sol_list(graph):
@@ -93,10 +102,13 @@ class MySteinlibInstance(SteinlibInstance):
         self.my_graph.add_edge(e_start, e_end, weight=weight)
 
 
+file_name = "b07"
+file = ".stp"
+stein_file = "data/B/" + file_name + file
+
 if __name__ == "__main__":
     my_class = MySteinlibInstance()
     with open(stein_file) as my_file:
-
         # initialisation
         my_parser = SteinlibParser(my_file, my_class)
         my_parser.parse()
@@ -105,19 +117,39 @@ if __name__ == "__main__":
         my_sol = get_sol_list(my_graph)
 
         # execute simulated annealing algorithm
-        my_state = State(my_graph, my_terms, my_sol, temperature=30.0, speed=0.01)
-        final_state, point_x, point_y = annealing(my_state, 3000)
+        my_state1 = State(my_graph, my_terms, my_sol, temperature=30.0, speed=0.01)
+        final_state1, point_x1, point_y1 = annealing(my_state1, 3000)
 
-        # my_state.delete_random_node()
-        # my_state.delete_random_node()
-        # my_state.add_random_node()
+        # execute simulated annealing algorithm
+        my_state2 = State(my_graph, my_terms, my_sol, temperature=30.0, speed=0.01)
+        final_state2, point_x2, point_y2 = annealing(my_state2, 3000, False)
 
-        print(final_state)
-        # print(len(final_state.sol))
-        # print(len(final_state.terms))
-        # final_state.print_graph()
+        # # execute simulated annealing algorithm
+        # my_state3 = State(my_graph, my_terms, my_sol, temperature=30.0, speed=0.01)
+        # final_state3, point_x3, point_y3 = annealing(my_state3, 3000, False)
+        #
+        # # execute simulated annealing algorithm
+        # my_state4 = State(my_graph, my_terms, my_sol, temperature=30.0, speed=0.01)
+        # final_state4, point_x4, point_y4 = annealing(my_state4, 3000, False)
 
+        print("state with node method: " + str(final_state1))
+        print("state with edge method: " + str(final_state2))
 
         # show the graph
-        plt.plot(point_x, point_y)
+        plt.plot(point_x1, point_y1, color='r', label='with node method (result: ' + str(point_y1[len(point_y1)-1]) + ')')
+        plt.plot(point_x2, point_y2, color='b', label='with edge method (result: ' + str(point_y2[len(point_y2)-1]) + ')')
+        plt.xlabel("Number of evaluation times")
+        plt.ylabel("Weights total")
+        plt.title("Evaluation of two methods of algorithm simulated annealing " + str(file_name) +
+                  "\n using the sigmoid probability function"
+                  "\n(Tstart=30.0, speed=0.01)")
+        plt.legend()
         plt.show()
+
+        # plt.plot(point_x1, point_y1, color='r', label='with node method')
+        # plt.plot(point_x1, point_y2, color='b', label='with edge method')
+        # plt.xlabel("Number of evaluation times")
+        # plt.ylabel("Weights total")
+        # plt.title("Evaluation of two methods of algorithm simulated annealing \n(Tstart=30.0, speed=0.01)")
+        # plt.legend()
+        # plt.show()

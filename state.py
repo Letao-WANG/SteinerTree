@@ -99,8 +99,12 @@ class State(object):
             self.temperature = self.temperature - self.speed
 
     def delete_random_node(self):
-        # selected_not_terms_nodes = list(set(self.selected_nodes) - set(self.terms))
-        selected_not_terms_nodes = self.selected_nodes
+        # Fast delete method
+        selected_not_terms_nodes = list(set(self.selected_nodes) - set(self.terms))
+
+        # Normal delete method
+        # selected_not_terms_nodes = self.selected_nodes
+
         if len(selected_not_terms_nodes) > 0:
             node_delete = random.choice(selected_not_terms_nodes)
             neighbor_edges = self.get_neighbor_edges(node_delete)
@@ -109,9 +113,13 @@ class State(object):
                     self.sol.remove(edge)
 
     def add_random_node(self):
+        # Fast add method, but we don't recommend using it
         # not_terms = list(set(self.graph.nodes) - set(self.terms))
-        # unselected_terms_nodes = list(set(self.unselected_nodes) - set(not_terms))
+        # unselected_terms_nodes = list(set(self.unselected_nodes) - set(list(set(self.graph.nodes) - set(self.terms))))
+
+        # Normal add method
         unselected_terms_nodes = self.terms
+
         if len(unselected_terms_nodes) > 0:
             node_add = random.choice(unselected_terms_nodes)
             list_path = self.get_closest_path_to_selected_node(node_add)
